@@ -1,0 +1,32 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Wed Sep 30 06:25:27 2026
+[*]
+[dumpfile] "D:\depot\pz80\fpga\sim\build\uart_sim.vcd"
+[savefile] "D:\depot\pz80\fpga\sim\uart_sim.gtkw"
+[timestart] 0
+[size] 1311 1022
+[pos] 1255 144
+*-25.361383 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] uart_sim.
+[sst_width] 246
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 305
+@22
+uart_sim.uart_inst.baud_counter[7:0]
+@28
+uart_sim.uart_inst.baud_tick
+uart_sim.uart_inst.busy
+uart_sim.uart_inst.clk
+@22
+uart_sim.uart_inst.data_in[7:0]
+uart_sim.uart_inst.data_latch[7:0]
+uart_sim.uart_inst.frame_counter[3:0]
+@28
+uart_sim.uart_inst.serial_rx
+uart_sim.uart_inst.serial_tx
+@29
+uart_sim.uart_inst.write
+[pattern_trace] 1
+[pattern_trace] 0

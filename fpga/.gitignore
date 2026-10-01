@@ -1,0 +1,8 @@
+build/
+
+*.vcd
+*.fst
+*.vvp
+
+*.log
+*.tmp
