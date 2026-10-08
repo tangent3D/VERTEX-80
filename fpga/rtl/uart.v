@@ -12,9 +12,9 @@ module uart #(
 	output reg tx = 1,
 	
 	input wire read_data,
-	input wire read_status,
+	input wire read_register,
 	input wire write_data,
-	input wire write_control,
+	input wire write_register,
 	
 	input wire [7:0] i_data,
 	output reg [7:0] o_data

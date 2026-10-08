@@ -12,17 +12,17 @@ module top (
 	wire z80_wr_n;	
 
 	wire read_data;
-	wire read_status;
+	wire read_register;
 	wire write_data;
-	wire write_control;
+	wire write_register;
 
 	assign read_data =
 	    (z80_address[7:0] == `UART_DATA_PORT && 
 	    z80_iorq_n == 0 &&
 	    z80_rd_n == 0);
 
-	assign read_status =
-	    (z80_address[7:0] == `UART_STATUS_PORT &&
+	assign read_register =
+	    (z80_address[7:0] == `UART_REG_PORT &&
 	    z80_iorq_n == 0 &&
 	    z80_rd_n == 0);
 
@@ -31,8 +31,8 @@ module top (
 	    z80_iorq_n == 0 &&
 	    z80_wr_n == 0);
 
-	assign write_control =
-	    (z80_address[7:0] == `UART_STATUS_PORT &&
+	assign write_register =
+	    (z80_address[7:0] == `UART_REG_PORT &&
 	    z80_iorq_n == 0 &&
 	    z80_wr_n == 0);
 
@@ -42,9 +42,9 @@ module top (
 	    .tx(pin_uart_tx),
 
 	    .read_data(read_data),
-	    .read_status(read_status),
+	    .read_register(read_register),
 	    .write_data(write_data),
-	    .write_control(write_control)
+	    .write_register(write_register)
 	);
 
 endmodule

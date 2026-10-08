@@ -10,9 +10,9 @@ module uart_sim;
 	wire tx;
 	
 	reg read_data = 0;
-	reg read_status = 0;
+	reg read_register = 0;
 	reg write_data = 0;
-	reg write_control = 0;
+	reg write_register = 0;
 	
 	reg [7:0] i_data = 8'h00;
 	wire [7:0] o_data;
@@ -23,9 +23,9 @@ module uart_sim;
 	    .rx(rx),
 	    .tx(tx),
 	    .read_data(read_data),
-	    .read_status(read_status),
+	    .read_register(read_register),
 	    .write_data(write_data),
-	    .write_control(write_control),
+	    .write_register(write_register),
 	    .i_data(i_data),
 	    .o_data(o_data)
     );
