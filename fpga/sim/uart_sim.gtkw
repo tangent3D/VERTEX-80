@@ -16,13 +16,13 @@
 [sst_expanded] 1
 [sst_vpaned_height] 434
 @28
-uart_sim.uart_sim.clk
-uart_sim.uart_sim.rx
-uart_sim.uart_sim.tx
-uart_sim.uart_sim.read_data
-uart_sim.uart_sim.read_register
-uart_sim.uart_sim.write_data
-uart_sim.uart_sim.write_register
+uart_sim.uart_sim.i_clk
+uart_sim.uart_sim.i_rx
+uart_sim.uart_sim.o_tx
+uart_sim.uart_sim.i_read_data
+uart_sim.uart_sim.i_read_register
+uart_sim.uart_sim.i_write_data
+uart_sim.uart_sim.i_write_register
 @22
 uart_sim.uart_sim.i_data[7:0]
 @23

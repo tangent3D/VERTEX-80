@@ -5,32 +5,32 @@ module uart_sim;
 	// testbench drives it == reg
 	// uart drives it == wire
 
-	reg clk = 0;
-	reg rx = 1;
-	wire tx;
+	reg i_clk = 0;
+	reg i_rx = 1;
+	wire o_tx;
 	
-	reg read_data = 0;
-	reg read_register = 0;
-	reg write_data = 0;
-	reg write_register = 0;
+	reg i_read_data = 0;
+	reg i_read_register = 0;
+	reg i_write_data = 0;
+	reg i_write_register = 0;
 	
 	reg [7:0] i_data = 8'h00;
 	wire [7:0] o_data;
 
     uart uart_sim
     (
-	    .clk(clk),
-	    .rx(rx),
-	    .tx(tx),
-	    .read_data(read_data),
-	    .read_register(read_register),
-	    .write_data(write_data),
-	    .write_register(write_register),
+	    .i_clk(i_clk),
+	    .i_rx(i_rx),
+	    .o_tx(o_tx),
+	    .i_read_data(i_read_data),
+	    .i_read_register(i_read_register),
+	    .i_write_data(i_write_data),
+	    .i_write_register(i_write_register),
 	    .i_data(i_data),
 	    .o_data(o_data)
     );
 
-    always #18.518 clk = ~clk;
+    always #18.518 i_clk = ~i_clk;
 
     integer i;
 	reg [7:0] test_byte = 8'hAA;
@@ -42,10 +42,10 @@ module uart_sim;
     	
     	i_data = 8'b10101010;
     	
-		write_data = 1;
-		@(posedge clk);
-		@(negedge clk);
-		write_data = 0;
+		i_write_data = 1;
+		@(posedge i_clk);
+		@(negedge i_clk);
+		i_write_data = 0;
 		
 		wait (uart_sim.tx_busy == 1);
 		wait (uart_sim.tx_busy == 0);
@@ -54,30 +54,30 @@ module uart_sim;
 		// Test the receiver
 		//
 		
-	    rx = 1;
+	    i_rx = 1;
 	
-	    repeat (2) @(posedge clk);
+	    repeat (2) @(posedge i_clk);
 	
-	    @(negedge clk);
-	    rx = 0;
-	    repeat (234) @(posedge clk);
+	    @(negedge i_clk);
+	    i_rx = 0;
+	    repeat (234) @(posedge i_clk);
 	
 	    for (i = 0; i < 8; i = i + 1) begin
-	        @(negedge clk);
-	        rx = test_byte[i];
-	        repeat (234) @(posedge clk);
+	        @(negedge i_clk);
+	        i_rx = test_byte[i];
+	        repeat (234) @(posedge i_clk);
 	    end
 	
-	    @(negedge clk);
-	    rx = 1;
-	    repeat (234) @(posedge clk);
+	    @(negedge i_clk);
+	    i_rx = 1;
+	    repeat (234) @(posedge i_clk);
 	
 	    wait (uart_sim.rx_data_available == 1);
 
-   		read_data = 1;
-		@(posedge clk);
-		@(negedge clk);
-		read_data = 0;
+   		i_read_data = 1;
+		@(posedge i_clk);
+		@(negedge i_clk);
+		i_read_data = 0;
 
 		#100;
 		

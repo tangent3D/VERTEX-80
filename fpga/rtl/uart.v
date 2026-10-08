@@ -7,14 +7,14 @@ module uart #(
 	// external logic drives it == input wire
 	// module writes it in an always block == output reg
 
-	input wire clk,
-	input wire rx,
-	output reg tx = 1,
+	input wire i_clk,
+	input wire i_rx,
+	output reg o_tx = 1,
 	
-	input wire read_data,
-	input wire read_register,
-	input wire write_data,
-	input wire write_register,
+	input wire i_read_data,
+	input wire i_read_register,
+	input wire i_write_data,
+	input wire i_write_register,
 	
 	input wire [7:0] i_data,
 	output reg [7:0] o_data
@@ -30,7 +30,6 @@ module uart #(
 	reg [7:0] rx_shift_reg;
 	reg [7:0] rx_data;
 	reg rx_data_available = 0;
-	
 	reg tx_busy = 0;
 	reg [31:0] tx_baud_counter = 0;
 	reg tx_baud_tick = 0;
@@ -39,14 +38,14 @@ module uart #(
 
 // Receiver section
 
-	always @(posedge clk) begin
-		rx_meta <= rx;
+	always @(posedge i_clk) begin
+		rx_meta <= i_rx;
 		rx_sync <= rx_meta;
 		rx_sync_prev <= rx_sync;
 	end
 
-	always @(posedge clk) begin
-		if (read_data) begin
+	always @(posedge i_clk) begin
+		if (i_read_data) begin
 			rx_data_available <= 0;
 		end
 		
@@ -93,7 +92,7 @@ module uart #(
 
 // Transmitter section
 
-	always @(posedge clk) begin
+	always @(posedge i_clk) begin
 		if (tx_baud_counter == BAUD_DIV - 1) begin
 			tx_baud_counter <= 0;
 			tx_baud_tick <= 1;
@@ -102,22 +101,22 @@ module uart #(
 			tx_baud_tick <= 0;
 		end
 
-		if (write_data && !tx_busy) begin
+		if (i_write_data && !tx_busy) begin
 			tx_busy <= 1;
 			tx_data_latch <= i_data;
 			tx_frame_counter <= 0;
 			tx_baud_counter <= 0;
 			tx_baud_tick <= 0;
-			tx <= 0; // Start bit
+			o_tx <= 0; // Start bit
 		end
 		
 		if (tx_baud_tick && tx_busy) begin			
 			if (tx_frame_counter == 8) begin
-				tx <= 1; // Stop bit 
+				o_tx <= 1; // Stop bit 
 			end else if (tx_frame_counter == 9) begin
 				tx_busy <= 0; // Hold stop bit for baud_tick
 			end else begin
-				tx <= tx_data_latch[tx_frame_counter];
+				o_tx <= tx_data_latch[tx_frame_counter];
 			end
 			
 	 		if (tx_frame_counter < 9) begin
