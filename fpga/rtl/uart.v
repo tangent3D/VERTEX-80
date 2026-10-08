@@ -1,18 +1,24 @@
+`include "io_ports.vh"
+
 module uart #(
 	parameter BAUD_DIV = 234
 )
 (
+	// external logic drives it == input wire
+	// module writes it in an always block == output reg
+
 	input wire clk,
-	input wire serial_rx,
-	output reg serial_tx = 1,
-	input wire [7:0] tx_data,
-	input wire write,
-	output reg tx_busy = 0
+	input wire rx,
+	output reg tx = 1,
+	
+	input wire read_data,
+	input wire read_status,
+	input wire write_data,
+	input wire write_control,
+	
+	input wire [7:0] i_data,
+	output reg [7:0] o_data
 );
-	reg [31:0] tx_baud_counter = 0;
-	reg tx_baud_tick = 0;
-	reg [7:0] tx_data_latch;
-	reg [3:0] tx_frame_counter;
 
 	reg rx_meta = 1;
 	reg rx_sync = 1;
@@ -23,16 +29,27 @@ module uart #(
 	reg [3:0] rx_frame_counter = 0;
 	reg [7:0] rx_shift_reg;
 	reg [7:0] rx_data;
-	reg rx_data_ready = 0;
+	reg rx_data_available = 0;
+	
+	reg tx_busy = 0;
+	reg [31:0] tx_baud_counter = 0;
+	reg tx_baud_tick = 0;
+	reg [7:0] tx_data_latch;
+	reg [3:0] tx_frame_counter;
 
-	// sync async rx input to FPGA clock
+// Receiver section
+
 	always @(posedge clk) begin
-		rx_meta <= serial_rx;
+		rx_meta <= rx;
 		rx_sync <= rx_meta;
 		rx_sync_prev <= rx_sync;
 	end
 
 	always @(posedge clk) begin
+		if (read_data) begin
+			rx_data_available <= 0;
+		end
+		
 	    if (!rx_busy) begin
 			if (rx_sync == 0 && rx_sync_prev == 1) begin
 				rx_busy <= 1;
@@ -60,7 +77,7 @@ module uart #(
 	            	end else if (rx_frame_counter == 8) begin
 	         			if (rx_sync == 1) begin
 	         	         	rx_data <= rx_shift_reg;
-	         				rx_data_ready <= 1;
+	         				rx_data_available <= 1;
 	         				rx_busy <= 0;
 	         			end else begin
 							rx_busy <= 0;
@@ -74,6 +91,8 @@ module uart #(
 	    end
 	end
 
+// Transmitter section
+
 	always @(posedge clk) begin
 		if (tx_baud_counter == BAUD_DIV - 1) begin
 			tx_baud_counter <= 0;
@@ -83,22 +102,22 @@ module uart #(
 			tx_baud_tick <= 0;
 		end
 
-		if (write && !tx_busy) begin
+		if (write_data && !tx_busy) begin
 			tx_busy <= 1;
-			tx_data_latch <= tx_data;
+			tx_data_latch <= i_data;
 			tx_frame_counter <= 0;
 			tx_baud_counter <= 0;
 			tx_baud_tick <= 0;
-			serial_tx <= 0; // Start bit
+			tx <= 0; // Start bit
 		end
 		
 		if (tx_baud_tick && tx_busy) begin			
 			if (tx_frame_counter == 8) begin
-				serial_tx <= 1; // Stop bit 
+				tx <= 1; // Stop bit 
 			end else if (tx_frame_counter == 9) begin
 				tx_busy <= 0; // Hold stop bit for baud_tick
 			end else begin
-				serial_tx <= tx_data_latch[tx_frame_counter];
+				tx <= tx_data_latch[tx_frame_counter];
 			end
 			
 	 		if (tx_frame_counter < 9) begin
@@ -106,4 +125,5 @@ module uart #(
 			end
 		end
 	end
+	
 endmodule

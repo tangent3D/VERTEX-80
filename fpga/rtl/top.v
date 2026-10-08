@@ -1,20 +1,50 @@
-module top
-(
-    input  wire clk,
-    output wire led
+`include "io_ports.vh"
+
+module top (
+    input wire pin_clk,
+    input wire pin_uart_rx,
+    output wire pin_uart_tx
 );
 
-uart uart_inst
-(
-	.clk(clk)
-);
+	wire [15:0] z80_address;
+	wire z80_iorq_n;
+	wire z80_rd_n;
+	wire z80_wr_n;	
 
-    reg [23:0] counter = 24'd0;
+	wire read_data;
+	wire read_status;
+	wire write_data;
+	wire write_control;
 
-    always @(posedge clk) begin
-        counter <= counter + 1'b1;
-    end
+	assign read_data =
+	    (z80_address[7:0] == `UART_DATA_PORT && 
+	    z80_iorq_n == 0 &&
+	    z80_rd_n == 0);
 
-    assign led = ~counter[3];
+	assign read_status =
+	    (z80_address[7:0] == `UART_STATUS_PORT &&
+	    z80_iorq_n == 0 &&
+	    z80_rd_n == 0);
+
+	assign write_data =
+	    (z80_address[7:0] == `UART_DATA_PORT &&
+	    z80_iorq_n == 0 &&
+	    z80_wr_n == 0);
+
+	assign write_control =
+	    (z80_address[7:0] == `UART_STATUS_PORT &&
+	    z80_iorq_n == 0 &&
+	    z80_wr_n == 0);
+
+	uart uart (
+	    .clk(pin_clk),
+	    .rx(pin_uart_rx),
+	    .tx(pin_uart_tx),
+
+	    .read_data(read_data),
+	    .read_status(read_status),
+	    .write_data(write_data),
+	    .write_control(write_control)
+	);
 
 endmodule

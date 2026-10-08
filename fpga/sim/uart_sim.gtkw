@@ -1,28 +1,31 @@
 [*]
 [*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
-[*] Fri Oct 02 18:53:14 2026
+[*] Thu Oct 08 08:09:56 2026
 [*]
 [dumpfile] "D:\depot\pz80\fpga\build\uart_sim.vcd"
-[dumpfile_mtime] "Fri Oct 02 18:51:18 2026"
-[dumpfile_size] 216126
+[dumpfile_mtime] "Thu Oct 08 08:08:45 2026"
+[dumpfile_size] 228064
 [savefile] "D:\depot\pz80\fpga\sim\uart_sim.gtkw"
 [timestart] 0
 [size] 2560 1393
-[pos] -339 -304
-*-25.361383 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -1 -1
+*-24.161383 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] uart_sim.
-[sst_width] 246
+[sst_width] 310
 [signals_width] 198
 [sst_expanded] 1
 [sst_vpaned_height] 434
 @28
-uart_sim.uart_inst.clk
-uart_sim.uart_inst.tx_busy
-uart_sim.uart_inst.serial_tx
+uart_sim.uart_sim.clk
+uart_sim.uart_sim.rx
+uart_sim.uart_sim.tx
+uart_sim.uart_sim.read_data
+uart_sim.uart_sim.read_status
+uart_sim.uart_sim.write_data
+uart_sim.uart_sim.write_control
 @22
-uart_sim.uart_inst.tx_data[7:0]
-uart_sim.uart_inst.tx_frame_counter[3:0]
-@28
-uart_sim.uart_inst.tx_baud_tick
+uart_sim.uart_sim.i_data[7:0]
+@23
+uart_sim.uart_sim.o_data[7:0]
 [pattern_trace] 1
 [pattern_trace] 0

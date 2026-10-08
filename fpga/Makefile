@@ -37,7 +37,7 @@ flash: build/top.fs
 	@openFPGALoader -b $(BOARD) -f build/top.fs
 
 sim: $(RTL) sim/uart_sim.v | build
-	@iverilog -s uart_sim -o build/uart_sim.vvp $(RTL) sim/uart_sim.v
+	@iverilog -I rtl -s uart_sim -o build/uart_sim.vvp $(RTL) sim/uart_sim.v
 	@vvp build/uart_sim.vvp
 	
 wave: sim
