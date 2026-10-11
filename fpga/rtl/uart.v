@@ -36,6 +36,24 @@ module uart #(
 	reg [7:0] tx_data_latch;
 	reg [3:0] tx_frame_counter;
 
+// Read and write registers
+
+	always @(*) begin
+		o_data = 8'h00;
+
+		if (i_read_data) begin
+			o_data = rx_data;
+		end else if (i_read_register) begin
+			// bit 0 = RX character available
+			// bit 1 = TX busy
+			o_data = {6'b000000, tx_busy, rx_data_available};
+		end
+
+		if (i_write_data) begin
+			o_data = 8'b00000000;
+		end
+	end
+
 // Receiver section
 
 	always @(posedge i_clk) begin

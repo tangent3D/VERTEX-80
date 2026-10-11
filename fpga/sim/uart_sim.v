@@ -74,12 +74,29 @@ module uart_sim;
 	
 	    wait (uart_sim.rx_data_available == 1);
 
+		i_read_register = 1;
+
+		#1000
+
+		i_read_register = 0;
+
+		#1000
+
    		i_read_data = 1;
-		@(posedge i_clk);
-		@(negedge i_clk);
+
+		#1000
+
 		i_read_data = 0;
 
-		#100;
+		#1000
+
+		i_read_register = 1;
+
+		#1000
+
+		i_read_register = 0;
+
+		#10000
 		
         $finish;
     end
