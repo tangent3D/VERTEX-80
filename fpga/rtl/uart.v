@@ -1,3 +1,4 @@
+`default_nettype none
 `include "io_ports.vh"
 
 module uart #(
@@ -144,3 +145,5 @@ module uart #(
 	end
 	
 endmodule
+
+`default_nettype wire

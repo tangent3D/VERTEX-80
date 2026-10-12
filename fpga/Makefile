@@ -5,6 +5,15 @@ TOP    = top
 
 RTL := $(wildcard rtl/*.v)
 
+TV80_RTL := \
+    third-party/tv80/rtl/core/tv80_alu.v \
+    third-party/tv80/rtl/core/tv80_reg.v \
+    third-party/tv80/rtl/core/tv80_mcode.v \
+    third-party/tv80/rtl/core/tv80_core.v \
+    third-party/tv80/rtl/core/tv80n.v
+
+SOURCES := $(RTL) $(TV80_RTL)
+
 export PYTHONWARNINGS := ignore::UserWarning
 
 .PHONY: all upload flash sim wave clean
@@ -14,8 +23,8 @@ all: build/top.fs
 build:
 	@mkdir -p build
 
-build/top.json: $(RTL) | build
-	@yosys -qq -p "read_verilog $(RTL); synth_gowin -top $(TOP) -json build/top.json"
+build/top.json: $(SOURCES) | build
+	@yosys -qq -p "read_verilog -Irtl $(SOURCES); synth_gowin -top $(TOP) -json build/top.json"
 
 build/top_pnr.json: build/top.json constraints/tangnano9k.cst
 	@nextpnr-himbaechel -q \
@@ -36,12 +45,14 @@ upload: build/top.fs
 flash: build/top.fs
 	@openFPGALoader -b $(BOARD) -f build/top.fs
 
-sim: $(RTL) sim/uart_sim.v | build
-	@iverilog -I rtl -s uart_sim -o build/uart_sim.vvp $(RTL) sim/uart_sim.v
-	@vvp build/uart_sim.vvp
-	
+SIM ?= top
+
+sim: $(SOURCES) sim/$(SIM)_sim.v | build
+	@iverilog -DSIMULATION -I rtl -s $(SIM)_sim -o build/$(SIM)_sim.vvp $(SOURCES) sim/$(SIM)_sim.v
+	@vvp build/$(SIM)_sim.vvp
+
 wave: sim
-	@gtkwave build/uart_sim.vcd sim/uart_sim.gtkw >nul 2>&1
+	@gtkwave build/$(SIM)_sim.vcd sim/$(SIM)_sim.gtkw >nul 2>&1
 
 clean:
 	@rm -rf build/*
