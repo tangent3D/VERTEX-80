@@ -16,7 +16,7 @@ SOURCES := $(RTL) $(TV80_RTL)
 
 export PYTHONWARNINGS := ignore::UserWarning
 
-.PHONY: all upload flash sim wave clean
+.PHONY: all upload flash sim wave log clean
 
 all: build/top.fs
 
@@ -44,6 +44,9 @@ upload: build/top.fs
 
 flash: build/top.fs
 	@openFPGALoader -b $(BOARD) -f build/top.fs
+
+log: | build
+	@yosys -p "read_verilog -Irtl $(SOURCES); synth_gowin -top $(TOP) -json build/top.json" > build/synthesis.log 2>&1
 
 SIM ?= top
 

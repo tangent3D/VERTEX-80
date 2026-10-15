@@ -84,7 +84,7 @@ module top (
 	wire [7:0] uart_data_out;
 
 	uart uart (
-	    .i_clk(pin_clk),
+	    .i_clk(pll_clk),
 	    .i_rx(pin_uart_rx),
 	    .o_tx(pin_uart_tx),
 
@@ -120,22 +120,50 @@ module top (
 // -----------------------------------------------------------------------------
 // ROM
 // -----------------------------------------------------------------------------
-	wire rom_read;
+	wire rom_select = !rom_disable && (cpu_addr <= 16'h0FFF);
 	wire [7:0] rom_data_out;
+	reg rom_disable = 1'b0;
 
 	rom rom (
-	    .i_read(rom_read),
+		.i_clk(pll_clk),
 	    .i_addr(cpu_addr),
 	    .o_data(rom_data_out)
 	);
 
-	assign rom_read =
-		(!cpu_mreq_n &&
-		!cpu_rd_n);
+	always @(posedge pll_clk) begin
+	    if (!reset_n)
+	        rom_disable <= 1'b0;
+	    else if (!cpu_iorq_n && !cpu_wr_n && cpu_addr[7:0] == `ROM_DISABLE)
+	        rom_disable <= 1'b1;
+	end
 
+// -----------------------------------------------------------------------------
+// RAM
+// -----------------------------------------------------------------------------
+	wire ram_select = cpu_addr <= 16'hA7FF;
+	wire ram_write;
+	wire [7:0] ram_data_out;
+
+	ram ram (
+		.i_clk(pll_clk),
+		.i_addr(cpu_addr),
+		.i_data(cpu_data_out),
+		.i_write(ram_write),
+		.o_data(ram_data_out)
+	);
+
+	assign ram_write = 
+		ram_select &&
+		!cpu_mreq_n &&
+		!cpu_wr_n;
+
+// -----------------------------------------------------------------------------
+// CPU data bus multiplexing
+// -----------------------------------------------------------------------------
 	assign cpu_data_in =
-	    rom_read ? rom_data_out :
-	    (uart_read_data || uart_read_register) ? uart_data_out :
+	    !cpu_mreq_n && rom_select ? rom_data_out :
+	    !cpu_mreq_n && ram_select ? ram_data_out :
+	    !cpu_iorq_n && (uart_read_data || uart_read_register) ? uart_data_out :
 	    8'hFF;
 	
 endmodule
