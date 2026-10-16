@@ -1,4 +1,4 @@
-*.bin
-*.hex
-*.map
-*.o
+*/*.bin
+*/*.hex
+*/*.map
+*/*.o
