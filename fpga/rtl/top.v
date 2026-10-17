@@ -4,7 +4,8 @@
 module top (
     input wire pin_clk,
     input wire pin_uart_rx,
-    output wire pin_uart_tx
+    output wire pin_uart_tx,
+    output wire [5:0] pin_led,
 );
 // -----------------------------------------------------------------------------
 // PLL
@@ -12,19 +13,19 @@ module top (
 	wire pll_clk;
 	wire pll_locked;
 
-	`ifdef SIMULATION
+`ifdef SIMULATION
 
     assign pll_clk = pin_clk;
     assign pll_locked = 1'b1;
 
-	`else
+`else
 
     pll pll (
         .clock_in(pin_clk),
         .clock_out(pll_clk),
         .locked(pll_locked)
     );
-	`endif
+`endif
 
 // -----------------------------------------------------------------------------
 // Power-on reset
@@ -120,9 +121,10 @@ module top (
 // -----------------------------------------------------------------------------
 // ROM
 // -----------------------------------------------------------------------------
-	wire rom_select = !rom_disable && (cpu_addr <= 16'h0FFF);
 	wire [7:0] rom_data_out;
 	reg rom_disable = 1'b0;
+	wire rom_select = !rom_disable && (cpu_addr <= 16'h0FFF);
+
 
 	rom rom (
 		.i_clk(pll_clk),
@@ -140,9 +142,9 @@ module top (
 // -----------------------------------------------------------------------------
 // RAM
 // -----------------------------------------------------------------------------
+	wire [7:0] ram_data_out;
 	wire ram_select = cpu_addr <= 16'hA7FF;
 	wire ram_write;
-	wire [7:0] ram_data_out;
 
 	ram ram (
 		.i_clk(pll_clk),
@@ -165,6 +167,18 @@ module top (
 	    !cpu_mreq_n && ram_select ? ram_data_out :
 	    !cpu_iorq_n && (uart_read_data || uart_read_register) ? uart_data_out :
 	    8'hFF;
+
+// -----------------------------------------------------------------------------
+// LED register
+// -----------------------------------------------------------------------------
+	reg [5:0] led_register = 6'b000000;
+
+	always @(posedge pll_clk) begin
+	    if (!cpu_iorq_n && !cpu_wr_n && cpu_addr[7:0] == 8'h40)
+	        led_register <= cpu_data_out[5:0];
+	end
+
+	assign pin_led = ~led_register;
 	
 endmodule
 

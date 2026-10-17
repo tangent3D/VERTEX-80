@@ -8,7 +8,7 @@ module rom (
 	reg [7:0] rom [0:16'h0FFF];
 	
 	initial begin
-	    $readmemh("rom/rom.hex", rom);
+	    $readmemh("../software/rom/rom.hex", rom);
 	end
 
 	always @(posedge i_clk)

@@ -2,8 +2,11 @@
 `include "io_ports.vh"
 
 module uart #(
-	// ~115200 baud divider (assumes 16 MHz clock)
-	parameter BAUD_DIV = 138
+`ifdef SIMULATION
+    parameter BAUD_DIV = 234
+`else
+    parameter BAUD_DIV = 138
+`endif
 )
 (
 	// external logic drives it == input wire

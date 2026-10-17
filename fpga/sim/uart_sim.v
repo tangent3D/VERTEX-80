@@ -96,9 +96,8 @@ module uart_sim;
 
 		i_read_register = 0;
 
-		#10000
-		
-        $finish;
+		#1000000;
+		$finish;
     end
 
     initial begin
