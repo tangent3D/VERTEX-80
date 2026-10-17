@@ -1,5 +1,3 @@
-; shitty LED scroller test
-
 init:
 	LD		A,1
 	
@@ -19,4 +17,3 @@ delay_loop:
     OR 		B
     JP 		NZ, delay_loop
     RET
-	
