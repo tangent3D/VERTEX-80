@@ -5,11 +5,11 @@ module por (
     output wire o_reset_n
 );
 
-	`ifdef SIMULATION
+`ifdef SIMULATION
     reg [3:0] reset_counter = 0;
-	`else
+`else
     reg [15:0] reset_counter = 0;
-	`endif
+`endif
 
     always @(posedge i_clk) begin
         if (!(&reset_counter))
